@@ -182,7 +182,7 @@ class Tree_bin():
 
     def main(self):
         args=self.getopt()
-        print('===== Stat each K-value result and find the best [%s]====='%args.func)
+        begin=show_info('===== Stat each K-value result and find the best [%s]====='%args.func)
         check_dir(args.out)
         admixture,samname,qsubfile=[],[],[]
         for i in glob.glob('%s/*.Q'%(args.dir)):
@@ -200,7 +200,7 @@ class Tree_bin():
         elif args.func=='admixtureGroup':
             self.admixture_group(args.file,args.out)
             self.group_allk(args.out)
-
+        run_time(begin)
 
 class Snp2file():
     def snp2file(self,snplist,keys,minInt,minMAF,types,outdir):
@@ -545,15 +545,13 @@ class Snp2file():
         for key,value in data_map.items():
             for i in value:
                 w_map.write('\t'.join([key,i,'0',i])+'\n')
-            # data_map.pop(key)
         w_map.close()
         data_map.clear()
-        # print(len(data_ped))
         for key,value in data_ped.items():
             result='\t'.join(value)
             w_ped.write('\t'.join([key,key,'0','0','0','1'])+'\t'+result+'\n')
-            # data_ped.pop(key)
         w_ped.close()
+
     def main(self):
         path=os.path.abspath(os.path.dirname(__file__))
         program_dir=os.path.basename(__file__)
@@ -838,13 +836,11 @@ class PrincipalComponentAnalysis():
 
     def TransFile(self,soft,file,outdir,maps,ped,keys,minInt,minMAF):
         begin=show_info('===== Trans snplist file to plink format is start =====')
-        print('===== Trans snplist file to plink format is start =====')
         if check_run(maps) and check_run(ped):soft.snp2file(file,keys,minInt,minMAF,4,outdir)
         run_time(begin)
 
     def Analysis(self,plink,outdir,pca,pcl,gcta):
         begin=show_info('===== Calculate with Plink is start =====')
-        print('===== Calculate with Plink is start =====')
         cmd='cd %s/plink/ && %s --noweb --file pca --maf 0.05 --make-bed --out pca'%(outdir,plink)
         run_cmd(cmd)
         # if check_run(bed):run_cmd(cmd)
@@ -884,7 +880,6 @@ class PrincipalComponentAnalysis():
 
     def DrawPicture(self,outdir,R,Rscript):
         begin=show_info("===== Draw Principal Component Analysis Pictures is start =====")
-        print("===== Draw Principal Component Analysis Pictures is start =====")
         #here you can change the Rscript
         cmd='cd %s && %s %s'%(outdir,Rscript,R)
         run_cmd(cmd)
