@@ -617,16 +617,17 @@ class LD_analysis():
 
     def LD_new(self,haploview,ped,info,out,args):
         for i in range(len(ped)):
-            name=ped.split('/')[-1].split('.')[0]
+            name=ped[i].split('/')[-1].split('.')[0]
             cmd='java -jar %s -pedfile %s -info %s -out %s/%s -n -compressedpng -check -dprime -memory 8100'%(haploview,ped[i],info[i],out,name)
             run_cmd(cmd)
             self.dist_sliding(out+'/'+name+'.LD',args.type,args.win,args.step,out,name)
 
     def Haploview(self,outdir,haploview,thr,args,tools):
         ######LD_analysis#######
-        out='%s/LD_analysis'%outdir
+        out='%s/Haploview'%outdir
         check_dir(out)
-        tools.snp2file(args.snp,args.prefix,args.minInt,args.minMAF,9,out)
+        if check_run(out+'/hapmap'):
+            tools.snp2file(args.snp,args.prefix,args.minInt,args.minMAF,9,out)
         # cmd='python %s -s %s/SNPresult.txt -o %s -k structure -t 9'%(soft.snp2xxx,args.dir,out)
         # run_cmd(cmd)
         ped,info=[],[]
