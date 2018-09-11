@@ -17,15 +17,6 @@ class Config():
 
         self.beagle='/home/chenqi/tree_soft/software/beagle/beagle.jar'
         self.svg='/home/chenqi/tree_soft/software/svg/svg2xxx'
-        self.fastqc='/home/chenqi/tree_soft/software/FastQC/fastqc'
-        self.cutadapt='/home/chenqi/tree_soft/bin/tree_build/cutadapt'
-        self.sickle='/home/chenqi/tree_soft/software/sickle-master/sickle'
-        self.GATK='/home/chenqi/tree_soft/software/GATK/GenomeAnalysisTK.jar'
-        self.picard='/home/chenqi/tree_soft/software/picard/picard-2.9.0/picard.jar'
-        self.samtools='/home/chenqi/tree_soft/software/samtools-1.4/samtools'
-        self.bcftools='/home/chenqi/tree_soft/software/bcftools-1.4/bcftools'
-        self.bwa='/home/chenqi/tree_soft/software/bwa-0.7.15/bwa'
-        self.vcfutils='/home/chenqi/tree_soft/software/bcftools-1.4/vcfutils.pl'
         self.plink='/home/chenqi/tree_soft/software/plink/plink'
         self.gcta='/home/chenqi/tree_soft/software/gcta/gcta64'
         ########draw tree##############
@@ -36,8 +27,6 @@ class Config():
         self.admixture='/home/chenqi/tree_soft/software/admixture/admixture'
         self.vcftools='/home/chenqi/tree_soft/software/vcftools_0.1.13/bin/vcftools'
         self.R='/home/chenqi/tree_soft/bin/tree_build/PCA.ggplot.R'
-        self.Rscript='/storage_wut/01Software/Anaconda/anaconda3/bin/Rscript'
-        self.python = '/storage_wut/01Software/Anaconda/anaconda3/bin/python3.6'
         
         ######LD_analysis#######
         self.plink2genotype='/home/chenqi/tree_soft/software/PopLDdecay/bin/mis/plink2genotype.pl'
