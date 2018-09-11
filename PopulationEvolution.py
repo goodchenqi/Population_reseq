@@ -596,6 +596,7 @@ class Snp2file():
 
 class LD_analysis():
     def PopLDdecay(self,soft,outdir,file,plink2genotype,PopLDdecay,Plot_OnePop,keys,minInt,minMAF):
+        begin=show_info('########PopLDdecay is start!###########')
         out='%s/PopLDdecay'%outdir
         check_dir(out)
         # if check_run('%s/plink/Pop.ped'%out):
@@ -608,28 +609,28 @@ class LD_analysis():
         run_cmd(cmd)
         cmd='perl %s -inFile %s/LDdecay.stat.gz -output %s/Fig'%(Plot_OnePop,out,out)
         run_cmd(cmd)
+        run_time(begin)
 
-    def LD(self,haploview,ped,info,out,args):
+    def LD(self,haploview,ped,info,out,args,memory):
         name=ped.split('/')[-1].split('.')[0]
-        cmd='java -jar %s -pedfile %s -info %s -out %s/%s -n -compressedpng -check -dprime -memory 8100'%(haploview,ped,info,out,name)
+        cmd='java -jar %s -pedfile %s -info %s -out %s/%s -n -compressedpng -check -dprime -memory %s'%(haploview,ped,info,out,name,memory)
         run_cmd(cmd)
         self.dist_sliding(out+'/'+name+'.LD',args.type,args.win,args.step,out,name)
 
-    def LD_new(self,haploview,ped,info,out,args):
+    def LD_new(self,haploview,ped,info,out,args,memory):
         for i in range(len(ped)):
             name=ped[i].split('/')[-1].split('.')[0]
-            cmd='java -jar %s -pedfile %s -info %s -out %s/%s -n -compressedpng -check -dprime -memory 8100'%(haploview,ped[i],info[i],out,name)
+            cmd='java -jar %s -pedfile %s -info %s -out %s/%s -n -compressedpng -check -dprime -memory %s'%(haploview,ped[i],info[i],out,name,memory)
             run_cmd(cmd)
             self.dist_sliding(out+'/'+name+'.LD',args.type,args.win,args.step,out,name)
 
-    def Haploview(self,outdir,haploview,thr,args,tools):
+    def Haploview(self,outdir,haploview,thr,args,tools,memory):
+        begin=show_info('##############Haploview is start!################')
         ######LD_analysis#######
         out='%s/Haploview'%outdir
         check_dir(out)
-        if check_run(out+'/hapmap'):
-            tools.snp2file(args.snp,args.prefix,args.minInt,args.minMAF,9,out)
-        # cmd='python %s -s %s/SNPresult.txt -o %s -k structure -t 9'%(soft.snp2xxx,args.dir,out)
-        # run_cmd(cmd)
+        # if check_run(out+'/hapmap'):
+        tools.snp2file(args.snp,args.prefix,args.minInt,args.minMAF,9,out)
         ped,info=[],[]
 
         for i in glob.glob('%s/hapmap/*.ped'%out):
@@ -641,7 +642,7 @@ class LD_analysis():
         if len(ped)<=thr:
             pool=multiprocessing.Pool(processes=len(ped))
             for i in range(len(ped)):
-                pool.apply_async(self.LD,(haploview,ped[i],info[i],out,args,))
+                pool.apply_async(self.LD,(haploview,ped[i],info[i],out,args,memory,))
             pool.close()
             pool.join()
         else:
@@ -655,9 +656,10 @@ class LD_analysis():
                 sta=end
                 num_yu-=1
             for i in range(len(site)):
-                pool.apply_async(self.LD_new,(haploview,ped[site[i][0]:site[i][1]],info[site[i][0]:site[i][1]],out,args,))
+                pool.apply_async(self.LD_new,(haploview,ped[site[i][0]:site[i][1]],info[site[i][0]:site[i][1]],out,args,memory,))
             pool.close()
             pool.join()
+        run_time(begin)
 
     def dist_sliding(self,file,types,win,step,outdir,name):
         path='/'.join(file.strip().split('/')[:-1]) if len(file.strip().split('/'))>1 else '.'
@@ -720,7 +722,33 @@ class LD_analysis():
             w.write('%s\t%.2f\n'%(int(pos),float(sums)/float(num)))
         w.close()
 
-    def getopt(self,):
+    ##you have to make sure where you can output fst result,and change the Q*.txt
+    def fst(self,vcf,group,outdir,vcftools):
+        begin=show_info('##########FST Calculate is start!##########')
+        out='%s/FST'%outdir
+        check_dir(out)
+        data,group_list={},[]
+        for i in open(group,'r'):
+            info=i.strip().split('\t')
+            if info[1] not in data:data[info[1]]=[]
+            data[info[1]].append(info[0])
+        for key,value in data.items():
+            group_list.append(out+'/'+key+'.txt')
+            w=open('%s/%s.txt'%(out,key),'w')
+            for i in value:
+                w.write(i+'\n')
+            w.close()
+        all_group=' --weir-fst-pop '.join(group_list)
+        all_group='--weir-fst-pop '+all_group
+        cmd='%s --vcf %s --out %s/fst_result %s --fst-window-size 3000'%(vcftools,vcf,out,all_group)
+        run_cmd(cmd)
+        for i in group_list:
+            os.remove(i)
+        cmd='%s --vcf %s --out %s/fst_result --window-pi 3000'%(vcftools,vcf,out)
+        run_cmd(cmd)
+        run_time(begin)
+
+    def getopt(self):
         parser = argparse.ArgumentParser(
             formatter_class=HelpFormatter, description=usage)
         parser.add_argument('func',choices=['LD_analysis'])
@@ -728,6 +756,10 @@ class LD_analysis():
             '-i', '--snplist', help='snplist', dest='snp',  type=str)
         parser.add_argument(
             '-o', '--outdir', help='outdir', dest='dir',  type=str)
+        parser.add_argument(
+            '-v','--vcf',help='vcf file',dest='vcf',type=str)
+        parser.add_argument(
+            '-g','--group',help='group file',dest='group',type=str)
         parser.add_argument(
             '-t','--thr',help='the num of LD threading',type=int,default=10,dest='thr')
         parser.add_argument(
@@ -742,6 +774,7 @@ class LD_analysis():
             '-M', '--minMAF', help='minMAF<default is 0.05>', dest='minMAF', type=float,default=0.05)
         parser.add_argument(
             '-I', '--minInt', help='minInt<default is 0.5>', dest='minInt', type=float,default=0.5)
+        parser.add_argument('-m','--memory',help='haploview run memory set(Mb)',dest='memory',type=int,default=8100)
         args=parser.parse_args()
         if not args.snp:
             print('snpvcf must be given!')
@@ -749,16 +782,30 @@ class LD_analysis():
         elif not args.dir:
             print('outdir must be given!')
             sys.exit(0)
+        elif not args.vcf:
+            print('vcf file must be given!')
+            sys.exit(0)
+        elif not args.group:
+            print('group file must be given!')
+            sys.exit(0)
         return args
 
-    def main(self,):
+    def main(self):
         args=self.getopt()
         soft=Config()
         out='%s/LD_analysis'%args.dir
         check_dir(out)
         tools=Snp2file()
+        logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s [line:%(lineno)d][%(levelname)s:] %(message)s',
+                            datefmt='%Y-%m-%d  %H:%M:%S',
+                            filename="%s/PrincipalComponentAnalysis.log"%out,
+                            filemode='w')
+        begin=show_info('############LD_analysis is start!############')
         self.PopLDdecay(tools,out,args.snp,soft.plink2genotype,soft.PopLDdecay,soft.Plot_OnePop,args.prefix,args.minInt,args.minMAF)
-        self.Haploview(out,soft.haploview,args.thr,args,tools)
+        self.Haploview(out,soft.haploview,args.thr,args,tools,args.memory)
+        self.fst(args.vcf,args.group,out,soft.vcftools)
+        run_time(begin)
 
 class PrincipalComponentAnalysis():
     def getopt(self):
@@ -936,12 +983,8 @@ class PopulotionStructure():
             samname.append(re.split(r'\s+',line.strip())[0])
         for i in glob.glob('%s/*.out'%indir):
             qsubfile.append(i.strip())
-        # self.admixtureQ(soft.admixture,samname,args.out,args.key)
-        # self.value_select(qsubfile,args.out,args.key)
         tree_bins.admixtureQ(admixture,samname,outdir,"Structure")
         tree_bins.value_select(qsubfile,outdir,"Structure")
-        # cmd='python %s/tree_bin.py Getadmixture -d %s -f %s -o %s'%(Bin,indir,file,outdir)
-        # run_cmd(cmd)
         run_time(begin)
 
     def Result(self,Bin,outdir,best,out,svg,k_value,tree_bins):
@@ -949,11 +992,6 @@ class PopulotionStructure():
         tree_bins.kvalue_distr(outdir,"Structure","%s/Structure.K_value_select"%outdir)
         tree_bins.admixture_group(best,outdir)
         tree_bins.group_allk(outdir)
-        #you can change the python version
-        # cmd='python %s/tree_bin.py KvalueDistribution -f %s/Structure.K_value_select -o %s'%(Bin,outdir,outdir)
-        # run_cmd(cmd)
-        # cmd='python %s/tree_bin.py admixtureGroup -f %s -o %s'%(Bin,best,outdir)
-        # run_cmd(cmd)
         k_p='-k %s'%k_value if k_value else ''
         cmd='perl %s/PopulationStructureDraw.pl -id %s -o %s/PopulotionStructure.svg -svg %s %s'%(Bin,outdir,out,svg,k_p)
         run_cmd(cmd)
@@ -986,7 +1024,6 @@ class PopulotionStructure():
         Bin='/'.join(file_path.split('/')[:-1])
         tools=Snp2file()
         tree_bins=Tree_bin()
-        # soft_snp2file=soft.snp2xxx
         self.TransFile(tools,args.input,out,args.prefix,args.minInt,args.minMAF)
         self.admixture(args.process,out,soft.admixture,ped,args.thread)
         self.GetAdmixture(Bin,out+'/admixture',ped,txt,tree_bins)
