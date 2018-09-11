@@ -756,7 +756,7 @@ class LD_analysis():
         out='%s/LD_analysis'%args.dir
         check_dir(out)
         tools=Snp2file()
-        self.PopLDdecay(tools,out,args.dir+'/SNPresult.txt',soft.plink2genotype,soft.PopLDdecay,soft.Plot_OnePop,args.prefix,args.minInt,args.MAF)
+        self.PopLDdecay(tools,out,args.snp,soft.plink2genotype,soft.PopLDdecay,soft.Plot_OnePop,args.prefix,args.minInt,args.minMAF)
         self.Haploview(out,soft.haploview,args.thr,args,tools)
 
 class PrincipalComponentAnalysis():
