@@ -19,6 +19,7 @@ class Config():
         self.svg='/home/chenqi/tree_soft/software/svg/svg2xxx'
         self.plink='/home/chenqi/tree_soft/software/plink/plink'
         self.gcta='/home/chenqi/tree_soft/software/gcta/gcta64'
+        self.vcftools='vcftools'
         ########draw tree##############
         self.FastTree='/home/chenqi/tree_soft/software/FastTree/FastTreeMP'
         ######################
@@ -27,6 +28,8 @@ class Config():
         self.admixture='/home/chenqi/tree_soft/software/admixture/admixture'
         self.vcftools='/home/chenqi/tree_soft/software/vcftools_0.1.13/bin/vcftools'
         self.R='/home/chenqi/tree_soft/bin/tree_build/PCA.ggplot.R'
+        self.Rscript='/storage_wut/01Software/Anaconda/anaconda3/bin/Rscript'
+        self.python='/storage_wut/01Software/Anaconda/anaconda3/bin/python3.6'
         
         ######LD_analysis#######
         self.plink2genotype='/home/chenqi/tree_soft/software/PopLDdecay/bin/mis/plink2genotype.pl'
