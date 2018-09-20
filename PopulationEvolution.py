@@ -13,6 +13,8 @@ import argparse
 from collections import OrderedDict
 from config import *
 try:
+    import matplotlib
+    matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     plt.switch_backend('agg')
     from matplotlib.backends.backend_pdf import PdfPages
