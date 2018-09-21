@@ -49,6 +49,7 @@ def draw_tree(outdir,PopulationEvolution):
     os.system(cmd)
 
 def other(outdir,vcf,PopulationEvolution):
+    path=os.path.abspath(outdir)
     ##############PopulotionStructure#############
     cmd='python %s PopulotionStructure -o %s -i %s/SNPresult.txt'%(PopulationEvolution,outdir,outdir)
     os.system(cmd)
@@ -56,6 +57,7 @@ def other(outdir,vcf,PopulationEvolution):
     cmd='python %s PrincipalComponentAnalysis -o %s -i %s/SNPresult.txt -g %s/PopulotionStructure/txt/group.txt'%(PopulationEvolution,outdir,outdir,outdir)
     os.system(cmd)
     ###############LD_analysis###############
+    os.chdir(path)
     cmd='python %s LD_analysis -i %s/SNPresult.txt -o %s -v %s -g %s/PopulotionStructure/txt/group.txt'%(PopulationEvolution,outdir,outdir,vcf,outdir)
     os.system(cmd)
 
