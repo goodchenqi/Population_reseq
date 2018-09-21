@@ -13,7 +13,6 @@ COPY ./package/ /usr/software/
 
 RUN mv /usr/bin/python3 /usr/bin/python \
     && Rscript -e "install.packages(\"ggplot2\")" \
-    && pip install matplotlib \
     && cd /usr/software \
     && tar -zxvf jre-1.8.0.tar.gz \
     && echo "export PATH=/usr/software/jre-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/bin:${PATH}">>/etc/profile \

@@ -6,15 +6,20 @@ import random
 import time
 import sys
 import os,re
+try:
+    import matplotlib
+except:
+    os.system('pip install matplotlib')
 import multiprocessing
 import logging
 import math
 import argparse
 from collections import OrderedDict
 from config import *
+os.system('source /etc/profile')
 try:
-    import matplotlib
-    matplotlib.use('Agg')
+    import matplotlib as mpl
+    mpl.use('Agg')
     import matplotlib.pyplot as plt
     plt.switch_backend('agg')
     from matplotlib.backends.backend_pdf import PdfPages
@@ -1252,6 +1257,32 @@ class vcf2snplist():
         self.merge(thr,name,"txt")
         run_time(run_start)
 
+class Imputation():
+    def getopt(self):
+        parser = argparse.ArgumentParser(
+            formatter_class=HelpFormatter, description=usages('imputation!'))
+        parser.add_argument('func',choices=['Imputation'])
+        parser.add_argument('-i','--vcf',dest='vcf',help='vcf file',type=str)
+        parser.add_argument('-o','--outdir',dest='outdir',help='outdir',type=str)
+        args=parser.parse_args()
+        if not args.vcf:
+            print('vcf file must be given!')
+            sys.exit(0)
+        elif not args.outdir:
+            print('outdir must be given')
+            sys.exit(0)
+        return args
+
+    def main(self):
+        args=self.getopt()
+        soft=Config()
+        check_dir(args.outdir)
+        out='%s/imputation'%args.outdir
+        check_dir(out)
+        name=args.vcf.split('/')[-1].split('.')[0]+'beagle'
+        cmd='cmd:java -XX:ParallelGCThreads=4 -Xmx20g -Djava.io.tmpdir=%s/tmp -jar %s gtgl=%s out=%s nthreads=%s impute=true'%(out,soft.beagle,args.vcf,out+'/'+name,30)
+        run_cmd(cmd)
+
 usage = '''
 Author : chenqi
 Email  : chenqi@gooalgene.com
@@ -1265,6 +1296,7 @@ Example:
 <functions>
     vcf2snplist                    Transeform vcf file to snplist file
     Snp2file                       Transeform snplist to the file:mega,structure,plink...
+    Imputation                     Imputation
     PhylogeneticTree               Construct Phylogenetic Tree
     PopulotionStructure            Populotion Structure computation
     PrincipalComponentAnalysis     PCA analysis
@@ -1277,6 +1309,9 @@ def main():
         sys.exit(0)
     if sys.argv[1]=='vcf2snplist':
         process=vcf2snplist()
+        process.main()
+    elif sys.argv[1]=='Imputation':
+        process=Imputation()
         process.main()
     elif sys.argv[1]=='PhylogeneticTree':
         process=PhylogeneticTree()

@@ -1,3 +1,4 @@
+install.packages("ggplot2")
 library(ggplot2)
 options(stringsAsFactors=F)
 t=read.table("PrincipalComponentAnalysis.matrix",check.names=F,header=T)

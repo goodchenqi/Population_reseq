@@ -11,6 +11,7 @@ import argparse
 import multiprocessing
 import glob
 from config import *
+os.system('source /etc/profile')
 #####Description####
 usage = '''
 Author : chenqi
