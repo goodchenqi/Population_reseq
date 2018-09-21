@@ -799,7 +799,7 @@ class LD_analysis():
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s [line:%(lineno)d][%(levelname)s:] %(message)s',
                             datefmt='%Y-%m-%d  %H:%M:%S',
-                            filename="%s/PrincipalComponentAnalysis.log"%out,
+                            filename="%s/LD_analysis.log"%out,
                             filemode='w')
         begin=show_info('############LD_analysis is start!############')
         self.PopLDdecay(tools,out,args.snp,soft.plink2genotype,soft.PopLDdecay,soft.Plot_OnePop,args.prefix,args.minInt,args.minMAF)
