@@ -793,7 +793,8 @@ class LD_analysis():
     def main(self):
         args=self.getopt()
         soft=Config()
-        out='%s/LD_analysis'%args.dir
+        dirs=os.path.abspath(args.dir)
+        out='%s/LD_analysis'%dirs
         check_dir(out)
         tools=Snp2file()
         logging.basicConfig(level=logging.INFO,
