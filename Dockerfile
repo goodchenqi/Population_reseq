@@ -12,6 +12,7 @@ COPY ./tree_build/ /population_analysis/
 COPY ./package/ /usr/software/
 
 RUN mv /usr/bin/python3 /usr/bin/python \
+    && pip install matplotlib \
     && Rscript -e "install.packages(\"ggplot2\")" \
     && cd /usr/software \
     && tar -zxvf jre-1.8.0.tar.gz \
