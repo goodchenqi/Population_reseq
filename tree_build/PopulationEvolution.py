@@ -12,7 +12,6 @@ import math
 import argparse
 from collections import OrderedDict
 from config import *
-os.system('source /etc/profile')
 try:
     import matplotlib as mpl
     mpl.use('Agg')
