@@ -6,10 +6,6 @@ import random
 import time
 import sys
 import os,re
-try:
-    import matplotlib
-except:
-    os.system('pip install matplotlib')
 import multiprocessing
 import logging
 import math
