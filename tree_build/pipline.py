@@ -48,8 +48,7 @@ def draw_tree(outdir,PopulationEvolution):
     cmd='python %s PhylogeneticTree -o %s -i %s/SNPresult.txt'%(PopulationEvolution,outdir,outdir)
     os.system(cmd)
 
-def other(outdir,vcf,PopulationEvolution):
-    path=os.path.abspath(outdir)
+def other(outdir,vcf,PopulationEvolution,outputs):
     ##############PopulotionStructure#############
     cmd='python %s PopulotionStructure -o %s -i %s/SNPresult.txt'%(PopulationEvolution,outdir,outdir)
     os.system(cmd)
@@ -57,7 +56,7 @@ def other(outdir,vcf,PopulationEvolution):
     cmd='python %s PrincipalComponentAnalysis -o %s -i %s/SNPresult.txt -g %s/PopulotionStructure/txt/group.txt'%(PopulationEvolution,outdir,outdir,outdir)
     os.system(cmd)
     ###############LD_analysis###############
-    os.chdir(path)
+    os.chdir(outputs)
     cmd='python %s LD_analysis -i %s/SNPresult.txt -o %s -v %s -g %s/PopulotionStructure/txt/group.txt'%(PopulationEvolution,outdir,outdir,vcf,outdir)
     os.system(cmd)
 
@@ -74,7 +73,7 @@ def main():
     os.system(cmd)
     pool=multiprocessing.Pool(processes=2)
     pool.apply_async(draw_tree,(f_out,soft.PopulationEvolution,))
-    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,))
+    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,args.dir,))
     pool.close()
     pool.join()
 
