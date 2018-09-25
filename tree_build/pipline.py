@@ -70,11 +70,12 @@ def main():
     check_dir(f_out)
     soft=Config()
     #############Transe vcf to snplist#########
+    vcf=os.path.abspath(args.vcf)
     cmd='python %s vcf2snplist -o %s -i %s'%(soft.PopulationEvolution,f_out,args.vcf)
     os.system(cmd)
     pool=multiprocessing.Pool(processes=2)
     pool.apply_async(draw_tree,(f_out,soft.PopulationEvolution,))
-    pool.apply_async(other,(f_out,args.vcf,soft.PopulationEvolution,))
+    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,))
     pool.close()
     pool.join()
 
