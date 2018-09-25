@@ -62,6 +62,7 @@ def other(outdir,vcf,PopulationEvolution,outputs):
 
 def main():
     args=getopt()
+    outputs=os.path.abspath(args.dir)
     name=args.vcf.split('/')[-1].split('.')[0]+'beagle'
     check_dir(args.dir)
     f_out=args.dir+'/Evolution'
@@ -73,7 +74,7 @@ def main():
     os.system(cmd)
     pool=multiprocessing.Pool(processes=2)
     pool.apply_async(draw_tree,(f_out,soft.PopulationEvolution,))
-    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,args.dir,))
+    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,outputs))
     pool.close()
     pool.join()
 
