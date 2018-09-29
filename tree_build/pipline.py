@@ -56,7 +56,7 @@ def other(outdir,vcf,PopulationEvolution,outputs):
     cmd='python %s PrincipalComponentAnalysis -o %s -i %s/SNPresult.txt -g %s/PopulotionStructure/txt/group.txt'%(PopulationEvolution,outdir,outdir,outdir)
     os.system(cmd)
     ###############LD_analysis###############
-    os.chdir(outputs)
+    os.chdir(os.path.abspath(outputs))
     cmd='python %s LD_analysis -i %s/SNPresult.txt -o %s -v %s -g %s/PopulotionStructure/txt/group.txt'%(PopulationEvolution,outdir,outdir,vcf,outdir)
     os.system(cmd)
 
@@ -74,7 +74,7 @@ def main():
     os.system(cmd)
     pool=multiprocessing.Pool(processes=2)
     pool.apply_async(draw_tree,(f_out,soft.PopulationEvolution,))
-    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,outputs))
+    pool.apply_async(other,(f_out,vcf,soft.PopulationEvolution,args.dir,))
     pool.close()
     pool.join()
 
